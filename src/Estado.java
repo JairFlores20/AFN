@@ -13,7 +13,7 @@ public class Estado {
     private int token1;
     private Set<Transicion> trans1 = new HashSet<>();
 
-    public Estado(int idEstado, boolean edoAcept, int token, Set<Transicion> trans1) {
+    public Estado() {
         this.idEstado1 = ContadorIdEstado++;
         this.edoAcept1 = false;
         this.token1 = -1;
