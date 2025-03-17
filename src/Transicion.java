@@ -17,13 +17,13 @@ public class Transicion {
         this.Edo= null;
     }
     // Metodo para actualizar la transición con dos símbolos
-    public void SetTransicion(char s1, char s2, Estado e){
+    public void setTransicion(char s1, char s2, Estado e){
         this.SimbInf1 = s1;
         this.SimbSup1 = s2;
         this.Edo = e;
     }
     // Metodo para actualizar la transición con un símbolo
-    public void SetTransicion(char s1, Estado e){
+    public void setTransicion(char s1, Estado e){
         this.SimbInf1 = s1;
         this.SimbSup1 = s1;
         this.Edo = e;

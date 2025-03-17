@@ -50,5 +50,9 @@ public class Estado {
     public void setIdEstado(int idEstado1) {
         this.idEstado1 = idEstado1;
     }
+    public void agregarTransicion(Transicion t) {
+        this.trans1.add(t);
+    }
+
 }
 

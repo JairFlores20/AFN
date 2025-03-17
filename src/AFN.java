@@ -18,6 +18,7 @@ public class AFN {
         this.Alfabeto.clear();
         this.AgregoAFNUnionLexico=false;
     }
+
     public AFN CrearAFNBasico(char s){
         Transicion t;
         Estado e1, e2;
@@ -42,7 +43,7 @@ public class AFN {
         t= new Transicion(s1,s2, e2);
         e1.getTrans1().add(t);
         e2.setEdoAcept(true);
-        for(char i=s1;i<s2;i++){
+        for(char i=s1;i<=s2;i++){
             Alfabeto.add(i);
         }
         EdoIni=e1;
@@ -56,7 +57,7 @@ public class AFN {
     public AFN UnirAFN(AFN f2){
         Estado e1 = new Estado();
         Estado e2 = new Estado();
-        //e1 tendra dos transiciones epsilo, una al edo inicial del AFN this y otra al de AFN2
+        //e1 tendra dos transiciones epsilon, una al edo inicial del AFN this y otra al de AFN2
         Transicion t1 = new Transicion(SimbolosEspeciales.EPSILON, this.EdoIni );
         Transicion t2 = new Transicion(SimbolosEspeciales.EPSILON, f2.EdoIni);
         e1.getTrans1().add(t1);
@@ -64,11 +65,11 @@ public class AFN {
         //Cada estado de aceptacion de this y f2 tendran una trans epsilon
         //Los de aceptacion dejaran de ser de aceptacion
         for(Estado e:this.EdosAcept){
-            e.getTrans1().add(new Transicion(SimbolosEspeciales.EPSILON, e2));
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON,e2));
             e.setEdoAcept(false);
         }
         for(Estado e: f2.EdosAcept){
-            e.getTrans1().add(new Transicion(SimbolosEspeciales.EPSILON, e2));
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON,e2));
             e.setEdoAcept(false);
         }
 
@@ -77,23 +78,87 @@ public class AFN {
         this.EdoIni=e1;
         e2.setEdoAcept(true);
         this.EdosAcept.add(e2);
-        this.EdosAcept.addAll(f2.EdosAFN);
+        this.EdosAFN.addAll(f2.EdosAFN);
         this.EdosAcept.add(e1);
         this.EdosAcept.add(e2);
         this.Alfabeto.addAll(f2.Alfabeto);
         return this;
     }
     public AFN ConcAFN(AFN f2){
-        for(Transicion t: f2.EdoIni.getTrans1())
-            for(Estado e : this.EdosAcept){
-                e.getTrans1().add(t);
+        // Para cada estado de aceptación de `this`, añadimos una transición epsilon hacia el estado inicial de `f2`
+        for(Estado e : this.EdosAcept){
+                e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON,f2.EdoIni));
                 e.setEdoAcept(false);
             }
+        //Eliminamos el estado inicial de f2 de su lista de estados
         f2.EdosAFN.remove(f2.EdoIni);
+        //Unimos los estados de transicion de f2 en this
         this.EdosAcept = f2.EdosAcept;
         this.EdosAFN.addAll(f2.EdosAFN);
         this.Alfabeto.addAll(f2.Alfabeto);
         return this;
+    }
+
+    public AFN Opcional(){
+        AFN f= new AFN();
+        Estado e1, e2;
+        e1 = new Estado();
+        e2 = new Estado();
+        e1.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, this.EdoIni));
+        e1.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON,e2));
+
+        for(Estado e: this.EdosAcept){
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, e2));
+            e.setEdoAcept(false);
+        }
+
+        e2.setEdoAcept(true);
+        f.EdoIni=e1;
+        f.Alfabeto.addAll(this.Alfabeto);
+        f.EdosAFN.addAll(this.EdosAFN);
+        f.EdosAFN.add(e1);
+        f.EdosAFN.add(e2);
+        f.EdosAcept.add(e2);
+        return f;
+    }
+    public AFN CerraduraKleene(){
+        AFN f= new AFN();
+        Estado e1, e2;
+        e1=new Estado();
+        e2=new Estado();
+        e1.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, this.EdoIni));
+        e1.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, e2));
+
+        for(Estado e: this.EdosAcept){
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, this.EdoIni));
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, e2));
+            e.setEdoAcept(false);
+        }
+        e2.setEdoAcept(true);
+        f.EdoIni=  e1;
+        f.EdosAFN.add(e1);
+        f.EdosAFN.add(e2);
+        f.EdosAcept.add(e2);
+        return f;
+    }
+    public AFN CerraduraPositiva(){
+        AFN f= new AFN();
+        Estado e1, e2;
+        e1=new Estado();
+        e2=new Estado();
+        e1.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, this.EdoIni));
+
+        for(Estado e: this.EdosAcept){
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, this.EdoIni));
+            e.agregarTransicion(new Transicion(SimbolosEspeciales.EPSILON, e2));
+            e.setEdoAcept(false);
+        }
+        e2.setEdoAcept(true);
+        f.EdoIni=  e1;
+        f.EdosAFN.add(e1);
+        f.EdosAFN.add(e2);
+        f.EdosAcept.add(e2);
+        return f;
     }
 
 }
